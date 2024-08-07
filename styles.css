@@ -15,6 +15,16 @@ canvas {
     background-color: #000;
 }
 
+#copyright {
+    margin-top: 20px;
+}
+
+#Directedby {
+    text-decoration: none;
+    color: #fff;
+    font-size: 14px;
+}
+
 #mainContainer {
     text-align: center;
 }
@@ -72,3 +82,10 @@ canvas {
     border: none;
     cursor: pointer;
 }
+
+#timer {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+
