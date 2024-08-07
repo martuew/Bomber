@@ -3,6 +3,9 @@ const ctx = canvas.getContext("2d");
 const messageElement = document.getElementById("message");
 const restartButton = document.getElementById("restartButton");
 
+const timerElement = document.createElement("div");
+document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
+
 const gridSize = 10;
 const cellSize = 40;
 const mineCount = 10;
@@ -13,7 +16,15 @@ let flagged = [];
 let gameOver = false;
 let remainingCells;
 
+let startTime = null;
+let timerInterval = null;
+
 function initGame() {
+    // Сброс и начальная настройка секундомера
+    timerElement.textContent = "Time: 0.00s";
+    startTime = null;
+    if (timerInterval) clearInterval(timerInterval);
+
     grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
     revealed = Array(gridSize).fill(null).map(() => Array(gridSize).fill(false));
     flagged = Array(gridSize).fill(null).map(() => Array(gridSize).fill(false));
@@ -51,6 +62,14 @@ function initGame() {
     draw();
 }
 
+function updateTimer() {
+    if (startTime !== null) {
+        const elapsed = Date.now() - startTime;
+        const seconds = (elapsed / 1000).toFixed(2); // Округление до сотых долей секунды
+        timerElement.textContent = `Time: ${seconds}s`;
+    }
+}
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < gridSize; i++) {
@@ -77,6 +96,35 @@ function draw() {
 }
 
 function reveal(x, y) {
+    if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || flagged[x][y]) {
+        return;
+    }
+
+    if (startTime === null) {
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 10); // Обновляем таймер каждую десятую секунды
+    }
+
+    revealed[x][y] = true;
+    remainingCells--;
+
+    if (grid[x][y] === 'B') {
+        gameOver = true;
+        messageElement.textContent = "YOU LOSE!";
+        clearInterval(timerInterval); // Останавливаем секундомер
+    } else if (remainingCells === 0) {
+        messageElement.textContent = "YOU WIN!";
+        clearInterval(timerInterval); // Останавливаем секундомер
+    } else if (grid[x][y] === 0) {
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                reveal(x + dx, y + dy);
+            }
+        }
+    }
+    draw();
+
+
     if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || flagged[x][y]) {
         return;
     }
