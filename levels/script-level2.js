@@ -6,9 +6,15 @@ const restartButton = document.getElementById("restartButton");
 const timerElement = document.createElement("div");
 document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
 
+const bombImage = new Image();
+bombImage.src = '../images/bomb.png'; 
+
 const gridSize = 15;
 const cellSize = 40;
 const mineCount = 25;
+
+const bombImageWidth = 40; // ширина изображения бомбы
+const bombImageHeight = 40; // высота изображения бомбы
 
 let grid = [];
 let revealed = [];
@@ -85,9 +91,11 @@ function draw() {
             ctx.strokeStyle = "#fff";
             ctx.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
             if (revealed[i][j] || (gameOver && grid[i][j] === 'B')) { // Отображаем бомбы при gameOver               
-                if (grid[i][j] === 'B') {
-                    ctx.fillStyle = "red";
-                    ctx.fillText("B", i * cellSize + cellSize / 2 - 5, j * cellSize + cellSize / 2 + 5);
+                // Рисуем изображение бомбы на всю клетку
+                    ctx.drawImage(bombImage, 
+                        0, 0, bombImage.width, bombImage.height, // Используем исходные размеры изображения
+                        i * cellSize, j * cellSize, bombImageWidth, bombImageHeight // Размеры на канвасе
+                    );
                 } else if (grid[i][j] > 0) {
                     // Устанавливаем цвет для цифр в зависимости от значения
                     switch (grid[i][j]) {
