@@ -6,6 +6,9 @@ const restartButton = document.getElementById("restartButton");
 const bombImage = new Image();
 bombImage.src = '../images/bomb.png'; 
 
+const flagImage = new Image();
+flagImage.src = '../images/flag.png'; 
+
 const timerElement = document.createElement("div");
 document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
 
@@ -16,6 +19,10 @@ const mineCount = 40;
 // Задайте размеры изображения вручную
 const bombImageWidth = 25; // ширина изображения бомбы
 const bombImageHeight = 25; // высота изображения бомбы
+
+
+const flagImageWidth = 25; // ширина изображения бомбы
+const flagImageHeight = 25; // высота изображения бомбы
 
 let grid = [];
 let revealed = [];
@@ -129,8 +136,10 @@ function draw() {
                 }
             }
             if (flagged[i][j] && !revealed[i][j]) {
-                ctx.fillStyle = "blue";
-                ctx.fillText("F", i * cellSize + cellSize / 2 - 5, j * cellSize + cellSize / 2 + 5);
+                ctx.drawImage(flagImage, 
+                        0, 0, flagImage.width, flagImage.height, // Используем исходные размеры изображения
+                        i * cellSize, j * cellSize, flagImageWidth, flagImageHeight // Размеры на канвасе
+                );
             }
         }
     }
