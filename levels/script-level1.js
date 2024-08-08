@@ -94,11 +94,11 @@ function draw() {
             ctx.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
             if (revealed[i][j] || (gameOver && grid[i][j] === 'B')) { // Отображаем бомбы при gameOver
                 if (grid[i][j] === 'B') {
-                    // Рисуем изображение бомбы на всю клетку
+                     // Рисуем изображение бомбы на всю клетку
                     ctx.drawImage(bombImage, 
-                        0, 0, bombImage.width, bombImage.height, // Отображаем всю исходную часть изображения
-                        i * cellSize, j * cellSize, cellSize, cellSize // Рисуем на канвасе
-                    );                
+                        0, 0, bombImage.width, bombImage.height, // Используем исходные размеры изображения
+                        i * cellSize, j * cellSize, bombImageWidth, bombImageHeight // Размеры на канвасе
+                    );               
                 } else if (grid[i][j] > 0) {
                     // Устанавливаем цвет для цифр в зависимости от значения
                     switch (grid[i][j]) {
