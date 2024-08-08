@@ -85,7 +85,7 @@ function draw() {
             ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
             ctx.strokeStyle = "#fff";
             ctx.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
-            if (revealed[i][j]) {
+            if (revealed[i][j] || (gameOver && grid[i][j] === 'B')) { // Отображаем бомбы при gameOver                
                 if (grid[i][j] === 'B') {
                     ctx.fillStyle = "red";
                     ctx.fillText("B", i * cellSize + cellSize / 2 - 5, j * cellSize + cellSize / 2 + 5);
@@ -144,6 +144,8 @@ function reveal(x, y) {
         gameOver = true;
         messageElement.textContent = "YOU LOSE!";
         clearInterval(timerInterval); // Останавливаем секундомер
+        draw(); // Перерисовываем поле, чтобы показать все бомбы
+        return;
     } else if (remainingCells === 0) {
         messageElement.textContent = "YOU WIN!";
         clearInterval(timerInterval); // Останавливаем секундомер
