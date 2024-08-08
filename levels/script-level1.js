@@ -103,31 +103,48 @@ function draw() {
 }
 
 function reveal(x, y) {
-    if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || flagged[x][y]) {
+    if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || gameOver) {
         return;
     }
 
     if (startTime === null) {
         startTime = Date.now();
-        timerInterval = setInterval(updateTimer, 10); // Обновляем таймер каждую десятую секунды
+        timerInterval = setInterval(updateTimer, 10);
     }
 
     revealed[x][y] = true;
-    remainingCells--;
+    const cell = gameContainer.children[x * gridSize + y];
+    cell.style.backgroundColor = '#bbb';
 
-    if (grid[x][y] === 'B') {
+    if (mines[x][y]) {
         gameOver = true;
-        messageElement.textContent = "YOU LOSE!";
-        clearInterval(timerInterval); // Останавливаем секундомер
-    } else if (remainingCells === 0) {
-        messageElement.textContent = "YOU WIN!";
-        clearInterval(timerInterval); // Останавливаем секундомер
-    } else if (grid[x][y] === 0) {
-        for (let dx = -1; dx <= 1; dx++) {
-            for (let dy = -1; dy <= 1; dy++) {
-                reveal(x + dx, y + dy);
+        clearInterval(timerInterval);
+        cell.style.backgroundColor = 'red';
+        showEndMessage('YOU LOSE!');
+        return;
+    }
+
+    const minesCount = countMines(x, y);
+
+    if (minesCount > 0) {
+        cell.textContent = minesCount;
+        cell.classList.add(`bomb-${minesCount}`);
+    } else {
+        // Рекурсивно открываем соседние клетки
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                reveal(x + i, y + j);
             }
         }
+    }
+
+    if (checkWin()) {
+        gameOver = true;
+        clearInterval(timerInterval);
+        showEndMessage('YOU WIN!');
+    }
+
+    updateDisplay();
     }
     draw();
 
