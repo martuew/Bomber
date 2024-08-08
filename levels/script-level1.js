@@ -1,18 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const gridSize = 10; // Размер сетки
-    const numMines = 10; // Количество мин
+    const level1Button = document.getElementById('level1');
+    const level2Button = document.getElementById('level2');
+    const startButton = document.getElementById('start-button');
+    const gameContainer = document.getElementById('game-container');
+    const timerElement = document.getElementById('timer');
+
+    let gridSize;
+    let numMines;
     let startTime = null;
     let timerInterval = null;
     let revealed = [];
     let mines = [];
     let gameOver = false;
 
-    const gameContainer = document.getElementById('game-container');
-    const timerElement = document.getElementById('timer');
-    const startButton = document.getElementById('start-button');
+    function setupLevel(level) {
+        if (level === 1) {
+            gridSize = 10;
+            numMines = 10;
+        } else if (level === 2) {
+            gridSize = 15;
+            numMines = 25;
+        }
+        initGame();
+    }
 
     function initGame() {
         gameContainer.innerHTML = '';
+        gameContainer.style.gridTemplateColumns = `repeat(${gridSize}, 30px)`;
         revealed = Array.from({ length: gridSize }, () => Array(gridSize).fill(false));
         mines = Array.from({ length: gridSize }, () => Array(gridSize).fill(false));
         gameOver = false;
@@ -35,12 +49,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cell = document.createElement('div');
                 cell.dataset.x = x;
                 cell.dataset.y = y;
+                cell.style.width = '30px';
+                cell.style.height = '30px';
+                cell.style.backgroundColor = '#ccc';
+                cell.style.display = 'flex';
+                cell.style.alignItems = 'center';
+                cell.style.justifyContent = 'center';
                 cell.addEventListener('click', () => reveal(x, y));
                 gameContainer.appendChild(cell);
             }
         }
-
-        startButton.disabled = false;
     }
 
     function updateTimer() {
@@ -136,16 +154,19 @@ document.addEventListener('DOMContentLoaded', () => {
         endMessage.textContent = message;
         endMessage.className = 'end-message';
         document.body.insertBefore(endMessage, gameContainer);
-        
+
         const restartButton = document.createElement('button');
         restartButton.textContent = 'RESTART';
         restartButton.addEventListener('click', () => {
             document.body.removeChild(endMessage);
+            document.body.removeChild(restartButton);
             initGame();
         });
         document.body.insertBefore(restartButton, gameContainer);
     }
 
+    level1Button.addEventListener('click', () => setupLevel(1));
+    level2Button.addEventListener('click', () => setupLevel(2));
     startButton.addEventListener('click', initGame);
 
     initGame();
