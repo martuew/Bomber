@@ -21,8 +21,8 @@ const bombImageWidth = 25; // ширина изображения бомбы
 const bombImageHeight = 25; // высота изображения бомбы
 
 
-const flagImageWidth = 25; // ширина изображения бомбы
-const flagImageHeight = 25; // высота изображения бомбы
+const flagImageWidth = 22; // ширина изображения 
+const flagImageHeight = 22; // высота изображения 
 
 let grid = [];
 let revealed = [];
