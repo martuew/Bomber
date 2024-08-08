@@ -13,8 +13,8 @@ const gridSize = 15;
 const cellSize = 40;
 const mineCount = 25;
 
-const bombImageWidth = 40; // ширина изображения бомбы
-const bombImageHeight = 40; // высота изображения бомбы
+const bombImageWidth = 35; // ширина изображения бомбы
+const bombImageHeight = 35; // высота изображения бомбы
 
 let grid = [];
 let revealed = [];
