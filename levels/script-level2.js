@@ -7,7 +7,7 @@ const bombImage = new Image();
 bombImage.src = '../images/bomb.png'; 
 
 const flagImage = new Image();
-flagImage.src = '../images/flag.png'; 
+flagImage.src = '../images/flag1.png'; 
 
 const timerElement = document.createElement("div");
 document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
