@@ -3,11 +3,11 @@ const ctx = canvas.getContext("2d");
 const messageElement = document.getElementById("message");
 const restartButton = document.getElementById("restartButton");
 
-const timerElement = document.createElement("div");
-document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
-
 const bombImage = new Image();
 bombImage.src = '../images/bomb.png'; 
+
+const timerElement = document.createElement("div");
+document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
 
 const gridSize = 15;
 const cellSize = 40;
