@@ -9,9 +9,9 @@ bombImage.src = '../images/bomb.png';
 const timerElement = document.createElement("div");
 document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
 
-const gridSize = 15;
-const cellSize = 40;
-const mineCount = 25;
+const gridSize = 20;
+const cellSize = 30;
+const mineCount = 40;
 
 // Задайте размеры изображения вручную
 const bombImageWidth = 35; // ширина изображения бомбы
@@ -27,7 +27,6 @@ let startTime = null;
 let timerInterval = null;
 
 function initGame() {
-    // Сброс и начальная настройка секундомера
     timerElement.textContent = "Time: 0.00s";
     startTime = null;
     if (timerInterval) clearInterval(timerInterval);
