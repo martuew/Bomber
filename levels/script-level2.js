@@ -9,9 +9,9 @@ bombImage.src = '../images/bomb.png';
 const timerElement = document.createElement("div");
 document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
 
-const gridSize = 10;
+const gridSize = 15;
 const cellSize = 40;
-const mineCount = 10;
+const mineCount = 25;
 
 // Задайте размеры изображения вручную
 const bombImageWidth = 35; // ширина изображения бомбы
