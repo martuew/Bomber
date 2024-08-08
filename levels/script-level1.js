@@ -1,192 +1,152 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-const messageElement = document.getElementById("message");
-const restartButton = document.getElementById("restartButton");
+document.addEventListener('DOMContentLoaded', () => {
+    const gridSize = 10; // Размер сетки
+    const numMines = 10; // Количество мин
+    let startTime = null;
+    let timerInterval = null;
+    let revealed = [];
+    let mines = [];
+    let gameOver = false;
 
-const timerElement = document.createElement("div");
-document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
+    const gameContainer = document.getElementById('game-container');
+    const timerElement = document.getElementById('timer');
+    const startButton = document.getElementById('start-button');
 
-const gridSize = 10;
-const cellSize = 40;
-const mineCount = 10;
+    function initGame() {
+        gameContainer.innerHTML = '';
+        revealed = Array.from({ length: gridSize }, () => Array(gridSize).fill(false));
+        mines = Array.from({ length: gridSize }, () => Array(gridSize).fill(false));
+        gameOver = false;
+        startTime = null;
+        clearInterval(timerInterval);
+        timerElement.textContent = 'Time: 00:00:00';
 
-let grid = [];
-let revealed = [];
-let flagged = [];
-let gameOver = false;
-let remainingCells;
+        // Расставляем мины случайным образом
+        for (let i = 0; i < numMines; i++) {
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * gridSize);
+                y = Math.floor(Math.random() * gridSize);
+            } while (mines[x][y]);
+            mines[x][y] = true;
+        }
 
-let startTime = null;
-let timerInterval = null;
+        for (let x = 0; x < gridSize; x++) {
+            for (let y = 0; y < gridSize; y++) {
+                const cell = document.createElement('div');
+                cell.dataset.x = x;
+                cell.dataset.y = y;
+                cell.addEventListener('click', () => reveal(x, y));
+                gameContainer.appendChild(cell);
+            }
+        }
 
-function initGame() {
-    // Сброс и начальная настройка секундомера
-    timerElement.textContent = "Time: 0.00s";
-    startTime = null;
-    if (timerInterval) clearInterval(timerInterval);
+        startButton.disabled = false;
+    }
 
-    grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
-    revealed = Array(gridSize).fill(null).map(() => Array(gridSize).fill(false));
-    flagged = Array(gridSize).fill(null).map(() => Array(gridSize).fill(false));
-    gameOver = false;
-    remainingCells = gridSize * gridSize - mineCount;
-    messageElement.textContent = "";
-
-    let minesPlaced = 0;
-    while (minesPlaced < mineCount) {
-        const x = Math.floor(Math.random() * gridSize);
-        const y = Math.floor(Math.random() * gridSize);
-        if (grid[x][y] !== 'B') {
-            grid[x][y] = 'B';
-            minesPlaced++;
+    function updateTimer() {
+        if (startTime !== null) {
+            const elapsed = Date.now() - startTime;
+            const minutes = Math.floor(elapsed / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            const milliseconds = Math.floor((elapsed % 1000) / 10);
+            timerElement.textContent = `Time: ${pad(minutes, 2)}:${pad(seconds, 2)}:${pad(milliseconds, 2)}`;
         }
     }
 
-    for (let i = 0; i < gridSize; i++) {
-        for (let j = 0; j < gridSize; j++) {
-            if (grid[i][j] === 'B') continue;
-            let mineCount = 0;
-            for (let dx = -1; dx <= 1; dx++) {
-                for (let dy = -1; dy <= 1; dy++) {
-                    const ni = i + dx;
-                    const nj = j + dy;
-                    if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && grid[ni][nj] === 'B') {
-                        mineCount++;
+    function pad(number, length) {
+        return number.toString().padStart(length, '0');
+    }
+
+    function countMines(x, y) {
+        let count = 0;
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                if (x + i >= 0 && x + i < gridSize && y + j >= 0 && y + j < gridSize) {
+                    if (mines[x + i][y + j]) {
+                        count++;
                     }
                 }
             }
-            grid[i][j] = mineCount;
         }
+        return count;
     }
 
-    draw();
-}
+    function reveal(x, y) {
+        if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || gameOver) {
+            return;
+        }
 
-function updateTimer() {
-    if (startTime !== null) {
-        const elapsed = Date.now() - startTime;
-        const minutes = Math.floor(elapsed / 60000);
-        const seconds = Math.floor((elapsed % 60000) / 1000);
-        const milliseconds = Math.floor((elapsed % 1000) / 10);
-        timerElement.textContent = `Time: ${pad(minutes, 2)}:${pad(seconds, 2)}:${pad(milliseconds, 2)}`;
-    }
-}
+        if (startTime === null) {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 10);
+        }
 
+        revealed[x][y] = true;
+        const cell = gameContainer.children[x * gridSize + y];
+        cell.style.backgroundColor = '#bbb';
 
-function pad(number, length) {
-    return number.toString().padStart(length, '0');
-}
+        if (mines[x][y]) {
+            gameOver = true;
+            clearInterval(timerInterval);
+            cell.style.backgroundColor = 'red';
+            showEndMessage('YOU LOSE!');
+            return;
+        }
 
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < gridSize; i++) {
-        for (let j = 0; j < gridSize; j++) {
-            ctx.fillStyle = revealed[i][j] ? "#ddd" : "#aaa";
-            ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-            ctx.strokeStyle = "#fff";
-            ctx.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
-            if (revealed[i][j]) {
-                if (grid[i][j] === 'B') {
-                    ctx.fillStyle = "red";
-                    ctx.fillText("B", i * cellSize + cellSize / 2 - 5, j * cellSize + cellSize / 2 + 5);
-                } else if (grid[i][j] > 0) {
-                    ctx.fillStyle = "black";
-                    ctx.fillText(grid[i][j], i * cellSize + cellSize / 2 - 5, j * cellSize + cellSize / 2 + 5);
+        const minesCount = countMines(x, y);
+
+        if (minesCount > 0) {
+            cell.textContent = minesCount;
+            cell.classList.add(`bomb-${minesCount}`);
+        } else {
+            // Рекурсивно открываем соседние клетки
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    reveal(x + i, y + j);
                 }
             }
-            if (flagged[i][j] && !revealed[i][j]) {
-                ctx.fillStyle = "blue";
-                ctx.fillText("F", i * cellSize + cellSize / 2 - 5, j * cellSize + cellSize / 2 + 5);
+        }
+
+        if (checkWin()) {
+            gameOver = true;
+            clearInterval(timerInterval);
+            showEndMessage('YOU WIN!');
+        }
+
+        updateDisplay();
+    }
+
+    function checkWin() {
+        for (let x = 0; x < gridSize; x++) {
+            for (let y = 0; y < gridSize; y++) {
+                if (!revealed[x][y] && !mines[x][y]) {
+                    return false;
+                }
             }
         }
-    }
-}
-
-function reveal(x, y) {
-    if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || gameOver) {
-        return;
+        return true;
     }
 
-    if (startTime === null) {
-        startTime = Date.now();
-        timerInterval = setInterval(updateTimer, 10);
+    function updateDisplay() {
+        // Обновите отображение, если необходимо
     }
 
-    revealed[x][y] = true;
-    const cell = gameContainer.children[x * gridSize + y];
-    cell.style.backgroundColor = '#bbb';
-
-    if (mines[x][y]) {
-        gameOver = true;
-        clearInterval(timerInterval);
-        cell.style.backgroundColor = 'red';
-        showEndMessage('YOU LOSE!');
-        return;
+    function showEndMessage(message) {
+        const endMessage = document.createElement('div');
+        endMessage.textContent = message;
+        endMessage.className = 'end-message';
+        document.body.insertBefore(endMessage, gameContainer);
+        
+        const restartButton = document.createElement('button');
+        restartButton.textContent = 'RESTART';
+        restartButton.addEventListener('click', () => {
+            document.body.removeChild(endMessage);
+            initGame();
+        });
+        document.body.insertBefore(restartButton, gameContainer);
     }
 
-    const minesCount = countMines(x, y);
+    startButton.addEventListener('click', initGame);
 
-    if (minesCount > 0) {
-        cell.textContent = minesCount;
-        cell.classList.add(`bomb-${minesCount}`);
-    } else {
-        // Рекурсивно открываем соседние клетки
-        for (let i = -1; i <= 1; i++) {
-            for (let j = -1; j <= 1; j++) {
-                reveal(x + i, y + j);
-            }
-        }
-    }
-
-    if (checkWin()) {
-        gameOver = true;
-        clearInterval(timerInterval);
-        showEndMessage('YOU WIN!');
-    }
-
-    updateDisplay();
-    }
-    draw();
-
-
-    if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || flagged[x][y]) {
-        return;
-    }
-    revealed[x][y] = true;
-    remainingCells--;
-
-    if (grid[x][y] === 'B') {
-        gameOver = true;
-        messageElement.textContent = "YOU LOSE!";
-    } else if (remainingCells === 0) {
-        messageElement.textContent = "YOU WIN!";
-    } else if (grid[x][y] === 0) {
-        for (let dx = -1; dx <= 1; dx++) {
-            for (let dy = -1; dy <= 1; dy++) {
-                reveal(x + dx, y + dy);
-            }
-        }
-    }
-}
-
-canvas.addEventListener("click", function(e) {
-    if (gameOver) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / cellSize);
-    const y = Math.floor((e.clientY - rect.top) / cellSize);
-    reveal(x, y);
-    draw();
+    initGame();
 });
-
-canvas.addEventListener("contextmenu", function(e) {
-    e.preventDefault();
-    if (gameOver) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / cellSize);
-    const y = Math.floor((e.clientY - rect.top) / cellSize);
-    flagged[x][y] = !flagged[x][y];
-    draw();
-});
-
-ctx.font = "20px Arial";
-initGame();
