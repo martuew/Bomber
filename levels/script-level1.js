@@ -19,8 +19,8 @@ const mineCount = 10;
 const bombImageWidth = 35; // ширина изображения бомбы
 const bombImageHeight = 35; // высота изображения бомбы
 
-const flagImageWidth = 35; // ширина изображения бомбы
-const flagImageHeight = 35; // высота изображения бомбы
+const flagImageWidth = 32; // ширина изображения 
+const flagImageHeight = 32; // высота изображения
 
 let grid = [];
 let revealed = [];
