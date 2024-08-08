@@ -9,10 +9,11 @@ bombImage.src = '../images/bomb.png';
 const timerElement = document.createElement("div");
 document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
 
-const gridSize = 15;
+const gridSize = 10;
 const cellSize = 40;
-const mineCount = 25;
+const mineCount = 10;
 
+// Задайте размеры изображения вручную
 const bombImageWidth = 35; // ширина изображения бомбы
 const bombImageHeight = 35; // высота изображения бомбы
 
@@ -78,6 +79,7 @@ function updateTimer() {
     }
 }
 
+
 function pad(number, length) {
     return number.toString().padStart(length, '0');
 }
@@ -90,12 +92,13 @@ function draw() {
             ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
             ctx.strokeStyle = "#fff";
             ctx.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
-            if (revealed[i][j] || (gameOver && grid[i][j] === 'B')) { // Отображаем бомбы при gameOver               
-                // Рисуем изображение бомбы на всю клетку
-                ctx.drawImage(bombImage, 
-                    0, 0, bombImage.width, bombImage.height, // Используем исходные размеры изображения
-                    i * cellSize, j * cellSize, bombImageWidth, bombImageHeight // Размеры на канвасе
-                );    
+            if (revealed[i][j] || (gameOver && grid[i][j] === 'B')) { // Отображаем бомбы при gameOver
+                if (grid[i][j] === 'B') {
+                     // Рисуем изображение бомбы на всю клетку
+                    ctx.drawImage(bombImage, 
+                        0, 0, bombImage.width, bombImage.height, // Используем исходные размеры изображения
+                        i * cellSize, j * cellSize, bombImageWidth, bombImageHeight // Размеры на канвасе
+                    );               
                 } else if (grid[i][j] > 0) {
                     // Устанавливаем цвет для цифр в зависимости от значения
                     switch (grid[i][j]) {
@@ -134,8 +137,6 @@ function draw() {
     }
 }
 
-
-
 function reveal(x, y) {
     if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || flagged[x][y]) {
         return;
@@ -166,6 +167,26 @@ function reveal(x, y) {
         }
     }
     draw();
+
+
+    if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || flagged[x][y]) {
+        return;
+    }
+    revealed[x][y] = true;
+    remainingCells--;
+
+    if (grid[x][y] === 'B') {
+        gameOver = true;
+        messageElement.textContent = "YOU LOSE!";
+    } else if (remainingCells === 0) {
+        messageElement.textContent = "YOU WIN!";
+    } else if (grid[x][y] === 0) {
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                reveal(x + dx, y + dy);
+            }
+        }
+    }
 }
 
 canvas.addEventListener("click", function(e) {
