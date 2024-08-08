@@ -6,6 +6,10 @@ const restartButton = document.getElementById("restartButton");
 const bombImage = new Image();
 bombImage.src = './images/bomb.png'; 
 
+bombImage.onload = function() {
+    // Запускаем игру после того, как изображение загрузилось
+    initGame();
+};
 
 const timerElement = document.createElement("div");
 document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
