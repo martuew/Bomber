@@ -65,9 +65,16 @@ function initGame() {
 function updateTimer() {
     if (startTime !== null) {
         const elapsed = Date.now() - startTime;
-        const seconds = (elapsed / 1000).toFixed(2); // Округление до сотых долей секунды
-        timerElement.textContent = `Time: ${seconds}s`;
+        const minutes = Math.floor(elapsed / 60000);
+        const seconds = Math.floor((elapsed % 60000) / 1000);
+        const milliseconds = Math.floor((elapsed % 1000) / 10);
+        timerElement.textContent = `Time: ${pad(minutes, 2)}:${pad(seconds, 2)}:${pad(milliseconds, 2)}`;
     }
+}
+
+
+function pad(number, length) {
+    return number.toString().padStart(length, '0');
 }
 
 function draw() {
