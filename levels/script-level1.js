@@ -91,7 +91,7 @@ function draw() {
             ctx.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
             if (revealed[i][j] || (gameOver && grid[i][j] === 'B')) { // Отображаем бомбы при gameOver
                 if (grid[i][j] === 'B') {
-                    ctx.drawImage(bombImage, i * cellSize, j * cellSize, cellSize, cellSize); // Отображение изображения бомбы
+                    ctx.drawImage(bombImage, i * cellSize, j * cellSize, cellSize, cellSize); // Рисуем изображение на всю клетку
                 } else if (grid[i][j] > 0) {
                     // Устанавливаем цвет для цифр в зависимости от значения
                     switch (grid[i][j]) {
