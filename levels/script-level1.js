@@ -93,7 +93,7 @@ function draw() {
                     // Устанавливаем цвет для цифр в зависимости от значения
                     switch (grid[i][j]) {
                         case 1:
-                            ctx.fillStyle = "#000"; // Цвет для 1
+                            ctx.fillStyle = "black"; // Цвет для 1
                             break;
                         case 2:
                             ctx.fillStyle = "green"; // Цвет для 2
