@@ -92,10 +92,10 @@ function draw() {
             ctx.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
             if (revealed[i][j] || (gameOver && grid[i][j] === 'B')) { // Отображаем бомбы при gameOver               
                 // Рисуем изображение бомбы на всю клетку
-                    ctx.drawImage(bombImage, 
-                        0, 0, bombImage.width, bombImage.height, // Используем исходные размеры изображения
-                        i * cellSize, j * cellSize, bombImageWidth, bombImageHeight // Размеры на канвасе
-                    );
+                ctx.drawImage(bombImage, 
+                    0, 0, bombImageWidth, bombImageHeight, // Используем размеры изображения
+                    i * cellSize, j * cellSize, cellSize, cellSize // Размеры на канвасе
+                );
                 } else if (grid[i][j] > 0) {
                     // Устанавливаем цвет для цифр в зависимости от значения
                     switch (grid[i][j]) {
