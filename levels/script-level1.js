@@ -128,7 +128,6 @@ function draw() {
             }
         }
     }
-}
 
 function getColorForNumber(number) {
     switch (number) {
