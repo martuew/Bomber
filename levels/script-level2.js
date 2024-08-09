@@ -112,6 +112,7 @@ function draw() {
             }
 
             if (gameOver && grid[i][j] === 'B' && !revealed[i][j]) {
+                // Бомбы не отображаются, если в клетке есть флаг
                 if (!flagged[i][j]) {
                     ctx.drawImage(bombImage, i * cellSize, j * cellSize, bombImageWidth, bombImageHeight);
                 }
@@ -133,4 +134,56 @@ function getColorForNumber(number) {
     }
 }
 
-fun
+function reveal(x, y) {
+    if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || flagged[x][y]) {
+        return;
+    }
+
+    if (startTime === null) {
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 10); 
+    }
+
+    revealed[x][y] = true;
+    remainingCells--;
+
+    if (grid[x][y] === 'B') {
+        gameOver = true;
+        messageElement.textContent = "YOU LOSE!";
+        clearInterval(timerInterval);
+        draw(); 
+        return;
+    } else if (remainingCells === 0) {
+        messageElement.textContent = "YOU WIN!";
+        clearInterval(timerInterval); 
+    } else if (grid[x][y] === 0) {
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                reveal(x + dx, y + dy);
+            }
+        }
+    }
+    draw();
+}
+
+canvas.addEventListener("click", function(e) {
+    if (gameOver) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) / cellSize);
+    const y = Math.floor((e.clientY - rect.top) / cellSize);
+    reveal(x, y);
+    draw();
+});
+
+canvas.addEventListener("contextmenu", function(e) {
+    e.preventDefault();
+    if (gameOver) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) / cellSize);
+    const y = Math.floor((e.clientY - rect.top) / cellSize);
+    flagged[x][y] = !flagged[x][y];
+    draw();
+});
+
+ctx.font = "20px Arial";
+initGame();
