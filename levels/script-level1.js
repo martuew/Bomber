@@ -91,43 +91,43 @@ function pad(number, length) {
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     for (let i = 0; i < gridSize; i++) {
         for (let j = 0; j < gridSize; j++) {
+            // Фон ячейки
             ctx.fillStyle = revealed[i][j] ? "#ddd" : "#aaa";
             ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
             ctx.strokeStyle = "#fff";
             ctx.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
-            
-            if (flagged[i][j] && !revealed[i][j]) {
-                // Если ячейка помечена флагом и не открыта
-                ctx.drawImage(flagImage, 
-                    0, 0, flagImage.width, flagImage.height, 
-                    i * cellSize, j * cellSize, flagImageWidth, flagImageHeight
-                );
-            } 
 
+            // Если ячейка помечена флагом и не открыта
+            if (flagged[i][j] && !revealed[i][j]) {
+                ctx.drawImage(flagImage, i * cellSize, j * cellSize, flagImageWidth, flagImageHeight);
+            }
+
+            // Если ячейка открыта
             if (revealed[i][j]) {
-                // Если ячейка открыта
                 if (grid[i][j] === 'B') {
-                    ctx.drawImage(bombImage, 
-                        0, 0, bombImage.width, bombImage.height, 
-                        i * cellSize, j * cellSize, bombImageWidth, bombImageHeight
-                    );
+                    // Если это бомба
+                    ctx.drawImage(bombImage, i * cellSize, j * cellSize, bombImageWidth, bombImageHeight);
                 } else if (grid[i][j] > 0) {
+                    // Если это число
                     ctx.fillStyle = getColorForNumber(grid[i][j]);
                     ctx.fillText(grid[i][j], i * cellSize + cellSize / 2 - 5, j * cellSize + cellSize / 2 + 5);
                 }
             }
 
-            // Отображаем все бомбы, если игра закончена
+            // Показать все бомбы, если игра закончена (поражение)
             if (gameOver && grid[i][j] === 'B' && !revealed[i][j]) {
-                ctx.drawImage(bombImage, 
-                    0, 0, bombImage.width, bombImage.height, 
-                    i * cellSize, j * cellSize, bombImageWidth, bombImageHeight
-                );
+                if (!flagged[i][j]) {
+                    // Показать бомбу только если на ней нет флага
+                    ctx.drawImage(bombImage, i * cellSize, j * cellSize, bombImageWidth, bombImageHeight);
+                }
             }
         }
     }
+}
+
 
 function getColorForNumber(number) {
     switch (number) {
