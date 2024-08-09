@@ -98,59 +98,51 @@ function draw() {
             ctx.strokeStyle = "#fff";
             ctx.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
             
-             if (gameOver && grid[i][j] === 'B') { 
-                // Если игра закончена и на ячейке была бомба
-                ctx.drawImage(bombImage, 
-                        0, 0, bombImage.width, bombImage.height, // Используем исходные размеры изображения
-                        i * cellSize, j * cellSize, bombImageWidth, bombImageHeight // Размеры на канвасе
-                    ); 
+            if (flagged[i][j] && !revealed[i][j]) {
+                // Если ячейка помечена флагом и не открыта
+                ctx.drawImage(flagImage, 
+                    0, 0, flagImage.width, flagImage.height, 
+                    i * cellSize, j * cellSize, flagImageWidth, flagImageHeight
+                );
             } 
-             else if (grid[i][j] > 0) {
-                    // Устанавливаем цвет для цифр в зависимости от значения
-                    switch (grid[i][j]) {
-                        case 1:
-                            ctx.fillStyle = "black"; // Цвет для 1
-                            break;
-                        case 2:
-                            ctx.fillStyle = "green"; // Цвет для 2
-                            break;
-                        case 3:
-                            ctx.fillStyle = "red"; // Цвет для 4
-                            break;
-                        case 4:
-                            ctx.fillStyle = "purple"; // Цвет для 5
-                            break;
-                        case 5:
-                            ctx.fillStyle = "maroon"; // Цвет для 6
-                            break;
-                        case 6:
-                            ctx.fillStyle = "teal"; // Цвет для 7
-                            break;
-                        case 7:
-                            ctx.fillStyle = "navy"; // Цвет для 8
-                            break;
-                        default:
-                            ctx.fillStyle = "black"; // Цвет по умолчанию
-                    }
+
+            if (revealed[i][j]) {
+                // Если ячейка открыта
+                if (grid[i][j] === 'B') {
+                    ctx.drawImage(bombImage, 
+                        0, 0, bombImage.width, bombImage.height, 
+                        i * cellSize, j * cellSize, bombImageWidth, bombImageHeight
+                    );
+                } else if (grid[i][j] > 0) {
+                    ctx.fillStyle = getColorForNumber(grid[i][j]);
                     ctx.fillText(grid[i][j], i * cellSize + cellSize / 2 - 5, j * cellSize + cellSize / 2 + 5);
                 }
             }
-            if (flagged[i][j] && !revealed[i][j]) {
-                // Если ячейка помечена флагом и не открыта
-                ctx.fillStyle = "blue";
-                ctx.fillText("F", i * cellSize + cellSize / 2 - 5, j * cellSize + cellSize / 2 + 5);
 
-                // Если игра окончена, и под флагом была бомба, оставляем флаг.
-                // Можно добавить проверку на ошибочные флаги, если нужно.
-                if (gameOver && grid[i][j] === 'B') {
-                ctx.drawImage(flagImage, 
-                        0, 0, flagImage.width, flagImage.height, // Используем исходные размеры изображения
-                        i * cellSize, j * cellSize, flagImageWidth, flagImageHeight);
-                }
+            // Отображаем все бомбы, если игра закончена
+            if (gameOver && grid[i][j] === 'B' && !revealed[i][j]) {
+                ctx.drawImage(bombImage, 
+                    0, 0, bombImage.width, bombImage.height, 
+                    i * cellSize, j * cellSize, bombImageWidth, bombImageHeight
+                );
             }
         }
     }
 }
+
+function getColorForNumber(number) {
+    switch (number) {
+        case 1: return "black";
+        case 2: return "green";
+        case 3: return "red";
+        case 4: return "purple";
+        case 5: return "maroon";
+        case 6: return "teal";
+        case 7: return "navy";
+        default: return "black";
+    }
+}
+
 
 function reveal(x, y) {
     if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || flagged[x][y]) {
