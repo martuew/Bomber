@@ -14,7 +14,7 @@ document.body.insertBefore(timerElement, canvas); // Добавляем секу
 
 const gridSize = 10;
 const cellSize = 40;
-const mineCount = 10;
+const mineCount = 15;
 
 const bombImageWidth = 35; // ширина изображения бомбы
 const bombImageHeight = 35; // высота изображения бомбы
