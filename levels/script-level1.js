@@ -12,21 +12,25 @@ flagImage.src = '../images/flag1.png';
 const timerElement = document.createElement("div");
 document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
 
+const bombCounterElement = document.createElement("div");
+document.body.insertBefore(bombCounterElement, canvas); // Добавляем счётчик бомб в DOM
+
 const gridSize = 10;
 const cellSize = 40;
-const mineCount = 15;
+const mineCount = 10;
 
 const bombImageWidth = 35; // ширина изображения бомбы
 const bombImageHeight = 35; // высота изображения бомбы
 
-const flagImageWidth = 32; // ширина изображения 
-const flagImageHeight = 32; // высота изображения
+const flagImageWidth = 32; // ширина изображения флага
+const flagImageHeight = 32; // высота изображения флага
 
 let grid = [];
 let revealed = [];
 let flagged = [];
 let gameOver = false;
 let remainingCells;
+let remainingMines; // Переменная для отслеживания количества оставшихся мин
 
 let startTime = null;
 let timerInterval = null;
@@ -34,6 +38,7 @@ let timerInterval = null;
 function initGame() {
     // Сброс и начальная настройка секундомера
     timerElement.textContent = "Time: 0.00s";
+    bombCounterElement.textContent = `Mines left: ${mineCount}`; // Инициализация счётчика бомб
     startTime = null;
     if (timerInterval) clearInterval(timerInterval);
 
@@ -42,6 +47,7 @@ function initGame() {
     flagged = Array(gridSize).fill(null).map(() => Array(gridSize).fill(false));
     gameOver = false;
     remainingCells = gridSize * gridSize - mineCount;
+    remainingMines = mineCount; // Установка начального количества мин
     messageElement.textContent = "";
 
     let minesPlaced = 0;
@@ -82,6 +88,10 @@ function updateTimer() {
         const milliseconds = Math.floor((elapsed % 1000) / 10);
         timerElement.textContent = `Time: ${pad(minutes, 2)}:${pad(seconds, 2)}:${pad(milliseconds, 2)}`;
     }
+}
+
+function updateBombCounter() {
+    bombCounterElement.textContent = `Mines left: ${remainingMines}`;
 }
 
 function pad(number, length) {
@@ -172,6 +182,15 @@ function reveal(x, y) {
     draw(); // перемещено сюда
 }
 
+function updateFlaggedCells(x, y) {
+    if (flagged[x][y]) {
+        remainingMines--; // Уменьшаем количество оставшихся бомб
+    } else {
+        remainingMines++; // Увеличиваем количество оставшихся бомб
+    }
+    updateBombCounter();
+}
+
 canvas.addEventListener("click", function(e) {
     if (gameOver) return;
     const rect = canvas.getBoundingClientRect();
@@ -188,6 +207,7 @@ canvas.addEventListener("contextmenu", function(e) {
     const x = Math.floor((e.clientX - rect.left) / cellSize);
     const y = Math.floor((e.clientY - rect.top) / cellSize);
     flagged[x][y] = !flagged[x][y];
+    updateFlaggedCells(x, y); // Обновляем счётчик оставшихся бомб
     draw();
 });
 
