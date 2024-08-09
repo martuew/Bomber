@@ -97,14 +97,15 @@ function draw() {
             ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
             ctx.strokeStyle = "#fff";
             ctx.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
-            if (revealed[i][j] || (gameOver && grid[i][j] === 'B')) { // Отображаем бомбы при gameOver
-                if (grid[i][j] === 'B') {
-                     // Рисуем изображение бомбы на всю клетку
-                    ctx.drawImage(bombImage, 
+            
+             if (gameOver && grid[i][j] === 'B') { 
+                // Если игра закончена и на ячейке была бомба
+                ctx.drawImage(bombImage, 
                         0, 0, bombImage.width, bombImage.height, // Используем исходные размеры изображения
                         i * cellSize, j * cellSize, bombImageWidth, bombImageHeight // Размеры на канвасе
-                    );               
-                } else if (grid[i][j] > 0) {
+                    ); 
+            } 
+             else if (grid[i][j] > 0) {
                     // Устанавливаем цвет для цифр в зависимости от значения
                     switch (grid[i][j]) {
                         case 1:
@@ -135,10 +136,17 @@ function draw() {
                 }
             }
             if (flagged[i][j] && !revealed[i][j]) {
+                // Если ячейка помечена флагом и не открыта
+                ctx.fillStyle = "blue";
+                ctx.fillText("F", i * cellSize + cellSize / 2 - 5, j * cellSize + cellSize / 2 + 5);
+
+                // Если игра окончена, и под флагом была бомба, оставляем флаг.
+                // Можно добавить проверку на ошибочные флаги, если нужно.
+                if (gameOver && grid[i][j] === 'B') {
                 ctx.drawImage(flagImage, 
                         0, 0, flagImage.width, flagImage.height, // Используем исходные размеры изображения
-                        i * cellSize, j * cellSize, flagImageWidth, flagImageHeight // Размеры на канвасе
-                );
+                        i * cellSize, j * cellSize, flagImageWidth, flagImageHeight);
+                }
             }
         }
     }
