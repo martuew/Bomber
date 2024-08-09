@@ -32,6 +32,10 @@ let startTime = null;
 let timerInterval = null;
 
 function initGame() {
+    // Установка размера холста
+    canvas.width = gridSize * cellSize;
+    canvas.height = gridSize * cellSize;
+
     // Сброс и начальная настройка секундомера
     timerElement.textContent = "Time: 00:00:00";
     startTime = null;
@@ -112,7 +116,6 @@ function draw() {
             }
 
             if (gameOver && grid[i][j] === 'B' && !revealed[i][j]) {
-                // Бомбы не отображаются, если в клетке есть флаг
                 if (!flagged[i][j]) {
                     ctx.drawImage(bombImage, i * cellSize, j * cellSize, bombImageWidth, bombImageHeight);
                 }
@@ -186,4 +189,4 @@ canvas.addEventListener("contextmenu", function(e) {
 });
 
 ctx.font = "20px Arial";
-initGame();
+bombImage.onload = flagImage.onload = initGame; // Начало игры после загрузки изображений
