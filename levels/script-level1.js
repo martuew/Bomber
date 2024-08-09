@@ -13,11 +13,16 @@ const timerElement = document.createElement("div");
 document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
 
 const bombCounterElement = document.createElement("div");
+bombCounterElement.style.position = "absolute";
+bombCounterElement.style.top = "10px";
+bombCounterElement.style.left = "10px";
+bombCounterElement.style.fontSize = "20px";
+bombCounterElement.style.color = "black";
 document.body.insertBefore(bombCounterElement, canvas); // Добавляем счётчик бомб в DOM
 
 const gridSize = 10;
 const cellSize = 40;
-const mineCount = 10;
+const mineCount = 15;
 
 const bombImageWidth = 35; // ширина изображения бомбы
 const bombImageHeight = 35; // высота изображения бомбы
