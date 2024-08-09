@@ -9,12 +9,15 @@ bombImage.src = '../images/bomb.png';
 const flagImage = new Image();
 flagImage.src = '../images/flag1.png'; 
 
+// Добавляем элемент для отображения таймера и счётчика бомб
 const timerElement = document.createElement("div");
-document.body.insertBefore(timerElement, canvas); // Добавляем секундомер в DOM
+const bombCounterElement = document.createElement("div"); // Создаём элемент для счётчика бомб
+document.body.insertBefore(timerElement, canvas);
+document.body.insertBefore(bombCounterElement, canvas); // Добавляем счётчик бомб в DOM
 
 const gridSize = 20;
 const cellSize = 30;
-const mineCount = 50;
+const mineCount = 40;
 
 const bombImageWidth = 25; // ширина изображения бомбы
 const bombImageHeight = 25; // высота изображения бомбы
@@ -27,17 +30,15 @@ let revealed = [];
 let flagged = [];
 let gameOver = false;
 let remainingCells;
+let remainingMines = mineCount; // Количество оставшихся мин
 
 let startTime = null;
 let timerInterval = null;
 
 function initGame() {
-    // Установка размера холста
-    canvas.width = gridSize * cellSize;
-    canvas.height = gridSize * cellSize;
-
-    // Сброс и начальная настройка секундомера
+    // Сброс и начальная настройка таймера и счётчика бомб
     timerElement.textContent = "Time: 00:00:00";
+    bombCounterElement.textContent = `Mines left: ${remainingMines}`;
     startTime = null;
     if (timerInterval) clearInterval(timerInterval);
 
@@ -46,6 +47,7 @@ function initGame() {
     flagged = Array(gridSize).fill(null).map(() => Array(gridSize).fill(false));
     gameOver = false;
     remainingCells = gridSize * gridSize - mineCount;
+    remainingMines = mineCount; // Сбрасываем количество мин
     messageElement.textContent = "";
 
     let minesPlaced = 0;
@@ -116,6 +118,7 @@ function draw() {
             }
 
             if (gameOver && grid[i][j] === 'B' && !revealed[i][j]) {
+                // Бомбы не отображаются, если в клетке есть флаг
                 if (!flagged[i][j]) {
                     ctx.drawImage(bombImage, i * cellSize, j * cellSize, bombImageWidth, bombImageHeight);
                 }
@@ -184,9 +187,19 @@ canvas.addEventListener("contextmenu", function(e) {
     const rect = canvas.getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) / cellSize);
     const y = Math.floor((e.clientY - rect.top) / cellSize);
+
     flagged[x][y] = !flagged[x][y];
+
+    // Обновляем количество оставшихся мин
+    if (flagged[x][y]) {
+        remainingMines--;
+    } else {
+        remainingMines++;
+    }
+    bombCounterElement.textContent = `Mines left: ${remainingMines}`; // Обновляем отображение счётчика бомб
+
     draw();
 });
 
 ctx.font = "20px Arial";
-bombImage.onload = flagImage.onload = initGame; // Начало игры после загрузки изображений
+initGame();
