@@ -84,7 +84,6 @@ function updateTimer() {
     }
 }
 
-
 function pad(number, length) {
     return number.toString().padStart(length, '0');
 }
@@ -128,7 +127,6 @@ function draw() {
     }
 }
 
-
 function getColorForNumber(number) {
     switch (number) {
         case 1: return "black";
@@ -141,7 +139,6 @@ function getColorForNumber(number) {
         default: return "black";
     }
 }
-
 
 function reveal(x, y) {
     if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || flagged[x][y]) {
@@ -172,27 +169,7 @@ function reveal(x, y) {
             }
         }
     }
-    draw();
-
-
-    if (x < 0 || x >= gridSize || y < 0 || y >= gridSize || revealed[x][y] || flagged[x][y]) {
-        return;
-    }
-    revealed[x][y] = true;
-    remainingCells--;
-
-    if (grid[x][y] === 'B') {
-        gameOver = true;
-        messageElement.textContent = "YOU LOSE!";
-    } else if (remainingCells === 0) {
-        messageElement.textContent = "YOU WIN!";
-    } else if (grid[x][y] === 0) {
-        for (let dx = -1; dx <= 1; dx++) {
-            for (let dy = -1; dy <= 1; dy++) {
-                reveal(x + dx, y + dy);
-            }
-        }
-    }
+    draw(); // перемещено сюда
 }
 
 canvas.addEventListener("click", function(e) {
@@ -201,7 +178,7 @@ canvas.addEventListener("click", function(e) {
     const x = Math.floor((e.clientX - rect.left) / cellSize);
     const y = Math.floor((e.clientY - rect.top) / cellSize);
     reveal(x, y);
-    draw();
+    draw(); // вызов draw
 });
 
 canvas.addEventListener("contextmenu", function(e) {
@@ -216,4 +193,3 @@ canvas.addEventListener("contextmenu", function(e) {
 
 ctx.font = "20px Arial";
 initGame();
-
