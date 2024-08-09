@@ -127,7 +127,7 @@ function draw() {
         }
     }
 }
-
+}
 
 function getColorForNumber(number) {
     switch (number) {
@@ -216,3 +216,4 @@ canvas.addEventListener("contextmenu", function(e) {
 
 ctx.font = "20px Arial";
 initGame();
+
