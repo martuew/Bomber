@@ -36,6 +36,7 @@ let flagged = [];
 let gameOver = false;
 let remainingCells;
 let remainingMines; // Переменная для отслеживания количества оставшихся мин
+let flagLimit = mineCount; // Лимит на количество флагов
 
 let startTime = null;
 let timerInterval = null;
@@ -43,7 +44,7 @@ let timerInterval = null;
 function initGame() {
     // Сброс и начальная настройка секундомера
     timerElement.textContent = "Time: 0.00s";
-    bombCounterElement.textContent = `Mines left: ${mineCount}`; // Инициализация счётчика бомб
+    bombCounterElement.textContent = `Flags left: ${flagLimit}`; // Инициализация счётчика флагов
     startTime = null;
     if (timerInterval) clearInterval(timerInterval);
 
@@ -96,7 +97,7 @@ function updateTimer() {
 }
 
 function updateBombCounter() {
-    bombCounterElement.textContent = `Mines left: ${remainingMines}`;
+    bombCounterElement.textContent = `Flags left: ${flagLimit}`; // Обновляем счётчик флагов
 }
 
 function pad(number, length) {
@@ -175,8 +176,10 @@ function reveal(x, y) {
         draw(); // Перерисовываем поле, чтобы показать все бомбы
         return;
     } else if (remainingCells === 0) {
-        messageElement.textContent = "YOU WIN!";
-        clearInterval(timerInterval); // Останавливаем секундомер
+        if (checkWinCondition()) {
+            messageElement.textContent = "YOU WIN!";
+            clearInterval(timerInterval); // Останавливаем секундомер
+        }
     } else if (grid[x][y] === 0) {
         for (let dx = -1; dx <= 1; dx++) {
             for (let dy = -1; dy <= 1; dy++) {
@@ -190,10 +193,30 @@ function reveal(x, y) {
 function updateFlaggedCells(x, y) {
     if (flagged[x][y]) {
         remainingMines--; // Уменьшаем количество оставшихся бомб
+        flagLimit--; // Уменьшаем лимит флагов
     } else {
         remainingMines++; // Увеличиваем количество оставшихся бомб
+        flagLimit++; // Увеличиваем лимит флагов
     }
     updateBombCounter();
+    if (checkWinCondition()) {
+        messageElement.textContent = "YOU WIN!";
+        gameOver = true;
+        clearInterval(timerInterval);
+        draw();
+    }
+}
+
+function checkWinCondition() {
+    // Проверяем, установлены ли флаги на всех бомбах
+    for (let i = 0; i < gridSize; i++) {
+        for (let j = 0; j < gridSize; j++) {
+            if (grid[i][j] === 'B' && !flagged[i][j]) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 canvas.addEventListener("click", function(e) {
@@ -211,9 +234,11 @@ canvas.addEventListener("contextmenu", function(e) {
     const rect = canvas.getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) / cellSize);
     const y = Math.floor((e.clientY - rect.top) / cellSize);
-    flagged[x][y] = !flagged[x][y];
-    updateFlaggedCells(x, y); // Обновляем счётчик оставшихся бомб
-    draw();
+    if (flagLimit > 0) { // Только если еще не исчерпан лимит флагов
+        flagged[x][y] = !flagged[x][y];
+        updateFlaggedCells(x, y); // Обновляем счётчик оставшихся бомб и проверяем условие выигрыша
+        draw();
+    }
 });
 
 ctx.font = "20px Arial";
